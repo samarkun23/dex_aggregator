@@ -1,8 +1,9 @@
 import Head from "next/head";
 import { Navbar } from "./Navbar";
 import { FeatureCard, SwapWidget } from "./SwapWidget";
+import { Dex } from "@/app/page";
 
-export default function AeroDexLanding() {
+export default function AeroDexLanding({setSigner, dexes, signer, setTrade, setToken}: {setSigner: any , dexes: Dex[], signer: any , setTrade:any, setToken: any}) {
   return (
     <div className="min-h-screen bg-[#0c0e12] text-zinc-300 font-['Space_Grotesk'] selection:bg-cyan-400 selection:text-black">
       <Head>
@@ -10,7 +11,7 @@ export default function AeroDexLanding() {
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet" />
       </Head>
 
-      <Navbar />
+      <Navbar setSigner={setSigner} signer={signer}/>
 
       <main>
         {/* Hero Section */}
@@ -46,19 +47,18 @@ export default function AeroDexLanding() {
               </div>
 
               <div className="mt-16 flex items-center gap-6 justify-center lg:justify-start">
-                 <div className="flex -space-x-3">
+                 {/* <div className="flex -space-x-3">
                    {[1,2,3,4].map(i => (
                      <div key={i} className="w-8 h-8 rounded-full border-2 border-[#0c0e12] bg-zinc-800"></div>
                    ))}
-                 </div>
-                 <span className="text-xs text-zinc-500 font-medium">Trusted by <span className="text-white font-bold">15,000+</span> traders daily</span>
+                 </div> */}
               </div>
             </div>
 
             <div className="flex-1 w-full flex justify-center lg:justify-end relative">
                {/* Decorative Glow behind widget */}
                <div className="absolute inset-0 bg-cyan-400/10 blur-[80px] rounded-full scale-75 opacity-50"></div>
-               <SwapWidget />
+               <SwapWidget setSigner={setSigner} dexes={dexes} signer={signer} setTrade={setTrade} setToken={setToken}/>
             </div>
           </div>
         </section>
