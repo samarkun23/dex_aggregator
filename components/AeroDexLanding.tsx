@@ -3,7 +3,7 @@ import { Navbar } from "./Navbar";
 import { FeatureCard, SwapWidget } from "./SwapWidget";
 import { Dex } from "@/app/page";
 
-export default function AeroDexLanding({setSigner, dexes, signer, setTrade, setToken, trade}: {setSigner: any , dexes: Dex[], signer: any , setTrade:any, setToken: any, trade: any}) {
+export default function AeroDexLanding({setSigner, dexes, signer, setTrade, setToken, trade, token}: {setSigner: any , dexes: Dex[], signer: any , setTrade:any, setToken: any, trade: any, token: any}) {
   return (
     <div className="min-h-screen bg-[#0c0e12] text-zinc-300 font-['Space_Grotesk'] selection:bg-cyan-400 selection:text-black">
       <Head>
@@ -58,7 +58,7 @@ export default function AeroDexLanding({setSigner, dexes, signer, setTrade, setT
             <div className="flex-1 w-full flex justify-center lg:justify-end relative">
                {/* Decorative Glow behind widget */}
                <div className="absolute inset-0 bg-cyan-400/10 blur-[80px] rounded-full scale-75 opacity-50"></div>
-               <SwapWidget setSigner={setSigner} dexes={dexes} signer={signer} setTrade={setTrade} setToken={setToken} trade={trade}/>
+               <SwapWidget setSigner={setSigner} dexes={dexes} signer={signer} setTrade={setTrade} setToken={setToken} trade={trade} token={token}/>
             </div>
           </div>
         </section>

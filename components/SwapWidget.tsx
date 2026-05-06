@@ -7,12 +7,15 @@ import { Contract, formatUnits } from "ethers";
 import blockchain from '../app/blockchain.json'
 import { Trade } from "@/app/components/Trade";
 import { parseUnits } from "ethers";
+import tokenList from '../app/tokenList.json'
 
-export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade }: { setSigner: any, dexes: Dex[], signer: any, setTrade: any, setToken: any, trade: any }) => {
-  const [tokenIn, setTokenIn] = useState("");
-  const [tokenOut, setTokenOut] = useState("");
+export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade, token }: { setSigner: any, dexes: Dex[], signer: any, setTrade: any, setToken: any, trade: any, token: any }) => {
+  const [tokenIn, setTokenIn] = useState(tokenList[0].address);
+  const [tokenOut, setTokenOut] = useState(tokenList[1].address);
   const [amountIn, setAmountIn] = useState("");
-  
+  const [openTokenSelector, setOpenTokenSelector] = useState(false);
+  const [selectingFor, setSelectingFor] = useState("");
+
   const search = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     const tokenInContract = new Contract(tokenIn, blockchain.erc20Abi, signer);
@@ -20,21 +23,21 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
     const [decimalsIn, decimalsOut] = await Promise.all([tokenInContract.decimals(), tokenOutContract.decimals()]);
     // now we itrate all the dexes and call this function 
     // How ? We are going to create a array of promises and then we're going to do all these calls together otherwise if we wait for each of these call to be finished means if we don't do them congruently then if we have many calls to do then we screwed.
-    
+
     const validDexes = dexes.filter(dex => dex.contract);
-    
+
     // parse the amount in to the correct decimals
     const tokenContract = new Contract(tokenIn, blockchain.erc20Abi, signer);
     const decimals = await tokenContract.decimals();
     const ParsedAmountIn = parseUnits(amountIn, decimals);
-    
+
     const calls = validDexes.map(async (dex: any) => {
       try {
         const q = await dex.contract?.getAmountsOut(
           ParsedAmountIn,
           [tokenIn, tokenOut]
         )
-        return {q, dex};
+        return { q, dex };
       } catch (error) {
         return null;
       }
@@ -69,7 +72,7 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
     setTrade(
       {
         ...trades[0],
-        meta:{
+        meta: {
           decimalsIn,
           decimalsOut
         }
@@ -104,12 +107,18 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
                 type="text"
                 placeholder="0.0"
                 className="bg-transparent text-3xl text-white outline-none w-full font-mono placeholder:text-zinc-800"
-                onChange={e => setTokenIn(e.target.value)}
-                value={tokenIn}
+                onChange={e => setAmountIn(e.target.value)}
+                value={amountIn}
               />
-              <div className="bg-zinc-800 px-3 py-2 rounded-lg flex items-center gap-2 cursor-pointer border border-white/5 hover:bg-zinc-700 transition-all">
+              <div className="bg-zinc-800 px-3 py-2 rounded-lg flex items-center gap-2 cursor-pointer border border-white/5 hover:bg-zinc-700 transition-all"
+                onClick={() => {
+                  setSelectingFor("in");
+                  setOpenTokenSelector(true);
+                }}
+              >
+                {/* need to set the token  */}
                 <div className="w-5 h-5 bg-yellow-500/20 rounded-full flex items-center justify-center text-[10px] text-yellow-500">Ξ</div>
-                <span className="text-white font-bold text-sm">ETH</span>
+                <span className="text-white font-bold text-sm">WETH</span>
                 <svg className="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </div>
@@ -129,14 +138,18 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
               <span>Balance: 0.00</span>
             </div>
             <div className="flex justify-between items-center">
-              <input
+              <div
                 id="tokenOut"
-                type="text"
-                placeholder="0.0"
-                className="bg-transparent text-3xl text-white outline-none w-full font-mono placeholder:text-zinc-800"
-                onChange={e => setTokenOut(e.target.value)}
-                value={tokenOut}
-              />
+                className="bg-transparent text-3xl text-white outline-none w-full font-mono placeholder:text-zinc-800 "
+                onClick={() => {
+                  setSelectingFor("out")
+                  setOpenTokenSelector(true)
+                }}
+              >
+                {
+                  trade ? Number(formatUnits(trade.amountOut, trade.meta.decimalsOut)).toFixed(6) + "..." : "0"
+                }
+              </div>
               <div className="bg-cyan-400 px-3 py-2 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-cyan-300 transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)]">
                 <div className="w-5 h-5 bg-black/20 rounded-full flex items-center justify-center text-[10px] text-black">$</div>
                 <span className="text-black font-bold text-sm">USDC</span>
@@ -144,8 +157,62 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
               </div>
             </div>
           </div>
+
+          {/* {openTokenSelector && (
+            <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm flex items-center justify-center">
+
+              {/* modal card */}
+              {/* <div className="bg-zinc-900 border border-white/10 rounded-2xl w-[360px] max-h-[70vh] overflow-hidden shadow-2xl">
+
+                {/* header */}
+                {/* <div className="p-4 border-b border-white/10">
+                  <h2 className="text-white font-bold text-lg">Select Token</h2>
+                  <p className="text-xs text-zinc-400">Choose token for swap</p>
+                </div>
+
+                {/* token list */}
+                {/* <div className="max-h-[50vh] overflow-y-auto">
+                  {tokenList.map((token) => (
+                    <div
+                      key={token.address}
+                      onClick={() => {
+                        if (selectingFor === "in") {
+                          setTokenIn(token.address);
+                        } else {
+                          setTokenOut(token.address);
+                        }
+
+                        setOpenTokenSelector(false);
+                      }}
+                      className="flex items-center justify-between p-3 hover:bg-zinc-800 cursor-pointer transition-all border-b border-white/5"
+                    >
+                      <div>
+                        <div className="text-white font-semibold">{token.symbol}</div>
+                        <div className="text-[10px] text-zinc-500 truncate w-[240px]">
+                          {token.address}
+                        </div>
+                      </div>
+
+                      <div className="text-zinc-400 text-xs">›</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* footer */}
+                {/* <div className="p-3 border-t border-white/10 flex justify-end">
+                  <button
+                    onClick={() => setOpenTokenSelector(false)}
+                    className="text-sm text-zinc-400 hover:text-white transition"
+                  >
+                    Close
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )} */} 
           {/* Amount section  */}
-          <div className="bg-zinc-950/60 p-4 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
+          {/* <div className="bg-zinc-950/60 p-4 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
             <div className="flex justify-between text-[10px] uppercase tracking-wider text-zinc-500 mb-3 font-bold">
               <span>AMOUNT</span>
             </div>
@@ -159,42 +226,49 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
                 value={amountIn}
               />
             </div>
-          </div>
+          </div> */}
 
         </div>
 
 
         {/* Transaction Details */}
         {signer && (
-        <div className="mt-6 space-y-3 px-1">
-          <div className="flex justify-between text-[11px]">
-            <span className="text-zinc-200 text-[13px]">Exchange </span>
-            <span className="text-zinc-300 font-mono">
-              {dex ? dex.name : "Loading..."} 
-            </span>
+          <div className="mt-6 space-y-3 px-1">
+            <div className="flex justify-between text-[11px]">
+              <span className="text-zinc-200 text-[13px]">Exchange </span>
+              <span className="text-zinc-300 font-mono">
+                {dex ? dex.name : "Loading..."}
+              </span>
+            </div>
+            <div className="flex justify-between text-[11px]">
+              <span className="text-zinc-200 text-[13px]">Amount token sold</span>
+              <span className="text-green-400 font-bold">
+                {trade ? formatUnits(trade.amountIn, trade.meta.decimalsIn) : "Loading..."}
+              </span>
+            </div>
+            <div className="flex justify-between text-[11px]">
+              <span className="text-zinc-200 text-[13px]">Amount token bought</span>
+              <span className="text-green-400 font-bold">
+                {trade ? formatUnits(trade.amountOut, trade.meta.decimalsOut) : "Loading..."}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-[11px]">
+              <span className="text-zinc-200 text-[13px]">Slippage tolerance</span>
+              <span className="text-green-400 font-bold">
+                {trade ? "1%" : "Loading..."}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-between text-[11px]">
-            <span className="text-zinc-200 text-[13px]">Amount token sold</span>
-            <span className="text-green-400 font-bold">
-              {trade ? formatUnits(trade.amountIn, trade.meta.decimalsIn) : "Loading..."}
-            </span>
-          </div>
-          <div className="flex justify-between text-[11px]">
-            <span className="text-zinc-200 text-[13px]">Amount token bought</span>
-            <span className="text-green-400 font-bold">
-              {trade ? formatUnits(trade.amountOut, trade.meta.decimalsOut) : "Loading..."}
-            </span>
-          </div>
-        </div>
         )}
 
         {!signer ? (
           <>
             <WalletButtons miniButton={false} setSigner={setSigner} />
           </>
-        ): (
+        ) : (
           <>
-            {trade && <Trade trade={trade} />}  
+            {trade && <Trade trade={trade} dexes={dexes} signer={signer} />}
             <button className="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-black py-4 rounded-xl mt-8 transition-all shadow-[0_0_30px_rgba(34,211,238,0.25)] active:scale-[0.98] uppercase tracking-wider" type="submit">SUBMIT</button>
           </>
         )}
