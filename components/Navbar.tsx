@@ -12,9 +12,9 @@ export function Navbar({setSigner, signer}: {setSigner: any, signer: any}) {
             </div>
             {
                 signer ? (
-                    <WalletButtons  miniButton={true} setSigner={setSigner}/>
-                ):(
                     <div></div>
+                ):(
+                    <WalletButtons  miniButton={true} setSigner={setSigner}/>
                 )
             }
         </nav>

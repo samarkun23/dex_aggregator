@@ -3,42 +3,59 @@ import CogIcon from "./CogIcon";
 import SwapIcon from "./SwapIcon";
 import { useState } from "react";
 import { Dex } from "@/app/page";
-import { Contract } from "ethers";
+import { Contract, formatUnits } from "ethers";
 import blockchain from '../app/blockchain.json'
+import { Trade } from "@/app/components/Trade";
+import { parseUnits } from "ethers";
 
-export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken }: { setSigner: any, dexes: Dex[], signer: any, setTrade: any, setToken: any }) => {
+export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade }: { setSigner: any, dexes: Dex[], signer: any, setTrade: any, setToken: any, trade: any }) => {
   const [tokenIn, setTokenIn] = useState("");
   const [tokenOut, setTokenOut] = useState("");
-  const [amountOut, setAmountOut] = useState("");
-
+  const [amountIn, setAmountIn] = useState("");
+  
   const search = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
+    const tokenInContract = new Contract(tokenIn, blockchain.erc20Abi, signer);
+    const tokenOutContract = new Contract(tokenOut, blockchain.erc20Abi, signer);
+    const [decimalsIn, decimalsOut] = await Promise.all([tokenInContract.decimals(), tokenOutContract.decimals()]);
     // now we itrate all the dexes and call this function 
     // How ? We are going to create a array of promises and then we're going to do all these calls together otherwise if we wait for each of these call to be finished means if we don't do them congruently then if we have many calls to do then we screwed.
-    const calls = dexes.map(dex => {
-      if (!dex.contract) return null;
-
-      return dex.contract.getAmountsIn(
-        amountOut,
-        [tokenIn, tokenOut]
-      )
+    
+    const validDexes = dexes.filter(dex => dex.contract);
+    
+    // parse the amount in to the correct decimals
+    const tokenContract = new Contract(tokenIn, blockchain.erc20Abi, signer);
+    const decimals = await tokenContract.decimals();
+    const ParsedAmountIn = parseUnits(amountIn, decimals);
+    
+    const calls = validDexes.map(async (dex: any) => {
+      try {
+        const q = await dex.contract?.getAmountsOut(
+          ParsedAmountIn,
+          [tokenIn, tokenOut]
+        )
+        return {q, dex};
+      } catch (error) {
+        return null;
+      }
     });
+
+    console.log("CALLS", calls);
+
     const quotes = await Promise.all(calls); // this lauch all of those calls and when everthing finish we got array of array but we only care 1 element of each array
     console.log("QUOTES", quotes);
 
     // PROBLEM : If we short this array like this but we don't know which is which bec there is just a number so now we know the order when we call the dex.contract but in quotes we don't know what is what so we need to atach some more info to be able to indentify each element .
-    const validQuotes = quotes
-      .map((q, i) => ({ q, dex: dexes[i] }))
-      .filter(({ q }) => q != null);
+    const validQuotes = quotes.filter((quote): quote is { q: any, dex: any } => quote !== null);
 
-    console.log(validQuotes);
+    console.log("VALID QUOTES", validQuotes);
     // filter a valid quotes that are not null
     const trades = validQuotes.map(({ q, dex }) => (
       {
         address: dex.address,
         // @ts-ignore
         amountIn: q[0],
-        amountOut,
+        amountOut: q[q.length - 1],
         tokenIn,
         tokenOut
       }
@@ -46,17 +63,21 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken }: { s
 
     // now we short those trades and just take the best one 
     trades.sort((trade1, trade2) => (
-      trade1.amountIn < trade2.amountIn ? -1 : 1
-    ))
-    console.log(trades[0].amountIn.toString());
-    console.log(trades[0].address);
-    console.log(trades[1].amountIn.toString());
-    console.log(trades[2].amountIn.toString());
+      trade1.amountOut < trade2.amountOut ? -1 : 1
+    ));
 
-    setTrade(trades[0]);
-    const token = new Contract(tokenIn, blockchain.erc20Abi, signer);
-    setToken(token)
+    setTrade(
+      {
+        ...trades[0],
+        meta:{
+          decimalsIn,
+          decimalsOut
+        }
+      }
+    );
   }
+
+  const dex = dexes.find(dex => dex.address === trade?.address);
 
   return (
     <div className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden group">
@@ -134,8 +155,8 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken }: { s
                 type="text"
                 placeholder="0.0"
                 className="bg-transparent text-3xl text-white outline-none w-full font-mono placeholder:text-zinc-800"
-                onChange={e => setAmountOut(e.target.value)}
-                value={amountOut}
+                onChange={e => setAmountIn(e.target.value)}
+                value={amountIn}
               />
             </div>
           </div>
@@ -144,26 +165,40 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken }: { s
 
 
         {/* Transaction Details */}
+        {signer && (
         <div className="mt-6 space-y-3 px-1">
           <div className="flex justify-between text-[11px]">
-            <span className="text-zinc-500">Exchange Rate</span>
-            <span className="text-zinc-300 font-mono">1 ETH = 2,451.20 USDC</span>
+            <span className="text-zinc-200 text-[13px]">Exchange </span>
+            <span className="text-zinc-300 font-mono">
+              {dex ? dex.name : "Loading..."} 
+            </span>
           </div>
           <div className="flex justify-between text-[11px]">
-            <span className="text-zinc-500">Price Impact</span>
-            <span className="text-green-400 font-bold">&lt;0.01%</span>
+            <span className="text-zinc-200 text-[13px]">Amount token sold</span>
+            <span className="text-green-400 font-bold">
+              {trade ? formatUnits(trade.amountIn, trade.meta.decimalsIn) : "Loading..."}
+            </span>
           </div>
           <div className="flex justify-between text-[11px]">
-            <span className="text-zinc-500">Slippage Tolerance</span>
-            <span className="text-zinc-300">0.5%</span>
+            <span className="text-zinc-200 text-[13px]">Amount token bought</span>
+            <span className="text-green-400 font-bold">
+              {trade ? formatUnits(trade.amountOut, trade.meta.decimalsOut) : "Loading..."}
+            </span>
           </div>
         </div>
+        )}
 
         {!signer ? (
-          <WalletButtons miniButton={false} setSigner={setSigner} />
+          <>
+            <WalletButtons miniButton={false} setSigner={setSigner} />
+          </>
         ): (
-          <button className="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-black py-4 rounded-xl mt-8 transition-all shadow-[0_0_30px_rgba(34,211,238,0.25)] active:scale-[0.98] uppercase tracking-wider" type="submit">SUBMIT</button>
+          <>
+            {trade && <Trade trade={trade} />}  
+            <button className="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-black py-4 rounded-xl mt-8 transition-all shadow-[0_0_30px_rgba(34,211,238,0.25)] active:scale-[0.98] uppercase tracking-wider" type="submit">SUBMIT</button>
+          </>
         )}
+
       </form>
     </div>
   )
