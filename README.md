@@ -1,51 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ AeroDex — Multi-DEX Swap Aggregator
+A decentralized swap aggregator that finds the best token prices across multiple DEXs and executes optimized trades with gas estimation and slippage protection.
 
-## Getting Started
+## ✨ Features
+- 🔁 Multi-DEX token swapping
+- 📊 Real-time price comparison (best route selection)
+- ⚡ Gas estimation before transaction
+- 🧠 Smart trade routing engine
+- 🔐 Wallet connection (MetaMask/Web3)
+- 🔄 Dynamic token list system
+- 📉 Slippage protection mechanism
+- ⚙️ Fully on-chain execution logic
 
-First, run the development server:
+## 🧠 How It Works
+1. User selects tokens
+2. App queries multiple DEX contracts
+3. Fetches swap quotes using `getAmountsOut`
+4. Selects best output trade
+5. Estimates gas cost
+6. Approves ERC20 spending
+7. Executes swap transaction
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🔄 Architecture
+
+Frontend (Next.js + React)
+        
+        ↓
+
+Ethers.js (Blockchain Layer)
+
+        ↓
+
+Multiple DEX Contracts
+
+        ↓
+
+On-chain Swap Execution
+
+## 🛠 Tech Stack
+- Next.js 14
+- React
+- Ethers.js v6
+- Tailwind CSS
+- Solidity (DEX interaction)
+- Web3 Wallets (MetaMask)
+
+## 📁 Project Structure
+```
+/app
+  /components
+    Trade.tsx
+    ConnectButton.tsx
+  blockchain.json
+  tokenList.json
+/components
+    AeroDexLanding.tsx
+    CogIcon.tsx
+    Navbar.tsx
+    SwapIcon.tsx
+    SwapWidget.tsx
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚠️ Important Notes
+- Always verify ABI before swap execution
+- Token approval required before trading
+- Gas estimation may vary based on network congestion
+- Slippage is applied automatically during trade execution
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Future Improvements
+- 🔀 Multi-hop routing (A → B → C swaps)
+- 📊 Price impact visualization
+- 🌐 Add more DEX integrations
+- 📜 Transaction history tracking
+- 📱 Mobile-first UI optimization
+- 📡 Live price streaming (WebSockets)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧑‍💻 Setup
+1. Clone the repository : `git clone https://github.com/aerodex/aerodex.git`
+2. Install dependencies: `npm install`
+3. Run the project locally: `npm run dev`
 
-## Learn More
+## 🧠 Why this project is special
+DexFlow acts as a mini Uniswap aggregator engine:
 
-To learn more about Next.js, take a look at the following resources:
+- Finds liquidity across DEXs
+- Optimizes trade output
+- Reduces slippage loss
+- Gives better execution price automatically
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚠️ Disclaimer
+This project is built for educational & experimental DeFi development purposes only.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# dex_aggregator
-
-## What are the dexes I am adding to the aggregator?
-- Uniswap v2 
-    - Using periphery contract to get the price of the token pair
-- Sushiswap
-    - Using periphery contract to get the price of the token pair
-- Pancakeswap
-    - Using periphery contract to get the price of the token pair
-
-## Now we need ABI of the periphery contract of each dex to get the price of the token pair. We can get the ABI from the official documentation of each dex or from the verified contract on Etherscan.
-
-As soon as we have the ABI , we can use it to create a contract instance and call the function to get the price of the token pair . 
-Now when we get a signer we are going to create a js object connected to the different dexes
-Now we need to conditionally render another component search Trade so This is where we gonna put the detail of our trade what is the token we're going to sell we're token we're going to buy and how much the token we are going to buy . 
+## Badges
+![Next.js](https://img.shields.io/badge/Next.js-black)
+![Ethers](https://img.shields.io/badge/Ethers.js-blue)
+![Web3](https://img.shields.io/badge/Web3-DeFi-green)
