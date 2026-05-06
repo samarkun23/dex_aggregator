@@ -54,6 +54,7 @@ export default function Home() {
         setTrade={setTrade}
         setToken={setToken}
         trade={trade}
+        token={token}
       />
     </div>
   );
