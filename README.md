@@ -75,7 +75,7 @@ On-chain Swap Execution
 - 📡 Live price streaming (WebSockets)
 
 ## 🧑‍💻 Setup
-1. Clone the repository : `git clone https://github.com/aerodex/aerodex.git`
+1. Clone the repository : `git clone https://github.com/samarkun23/dex_aggregator.git`
 2. Install dependencies: `npm install`
 3. Run the project locally: `npm run dev`
 
