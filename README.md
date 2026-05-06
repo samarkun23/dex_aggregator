@@ -35,3 +35,17 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # dex_aggregator
+
+## What are the dexes I am adding to the aggregator?
+- Uniswap v2 
+    - Using periphery contract to get the price of the token pair
+- Sushiswap
+    - Using periphery contract to get the price of the token pair
+- Pancakeswap
+    - Using periphery contract to get the price of the token pair
+
+## Now we need ABI of the periphery contract of each dex to get the price of the token pair. We can get the ABI from the official documentation of each dex or from the verified contract on Etherscan.
+
+As soon as we have the ABI , we can use it to create a contract instance and call the function to get the price of the token pair . 
+Now when we get a signer we are going to create a js object connected to the different dexes
+Now we need to conditionally render another component search Trade so This is where we gonna put the detail of our trade what is the token we're going to sell we're token we're going to buy and how much the token we are going to buy . 

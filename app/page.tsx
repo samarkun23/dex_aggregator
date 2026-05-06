@@ -53,6 +53,7 @@ export default function Home() {
         signer={signer}
         setTrade={setTrade}
         setToken={setToken}
+        trade={trade}
       />
     </div>
   );
