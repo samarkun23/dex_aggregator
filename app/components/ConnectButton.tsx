@@ -53,7 +53,7 @@ export function ConnectButtonMini({ onConnect }: { onConnect: () => void }) {
 
     return (
         <div>
-            <button onClick={onConnect} className="bg-cyan-400 text-black px-6 py-2 rounded-sm font-bold hover:bg-cyan-300 active:scale-95 transition-all" type="button">
+            <button onClick={onConnect} className=" w-full bg-[#00e5ff] hover:bg-[#00b8d4] text-black font-bold py-3.5 px-2 text-xs tracking-[0.2em] uppercase transition-colors" type="button">
                 Connect Wallet
             </button>
         </div>
@@ -62,7 +62,7 @@ export function ConnectButtonMini({ onConnect }: { onConnect: () => void }) {
 
 export function ConnectButton({ onConnect }: { onConnect: () => void }) {
     return (
-        <button onClick={onConnect} className="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-black py-4 rounded-xl mt-8 transition-all shadow-[0_0_30px_rgba(34,211,238,0.25)] active:scale-[0.98] uppercase tracking-wider" type="button">
+        <button onClick={onConnect} className="mt-3 w-full bg-[#00e5ff] hover:bg-[#00b8d4] text-black font-bold py-3.5 text-xs tracking-[0.2em] uppercase transition-colors" type="button">
             Connect Wallet
         </button>
     )

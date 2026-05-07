@@ -69,8 +69,7 @@ export const Trade = ({ dexes, trade, signer }: { dexes: any, trade: any, signer
 
     return (
         <>
-            <h3>The best price is </h3>
-            <button className="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-black py-4 rounded-xl mt-8 transition-all shadow-[0_0_30px_rgba(34,211,238,0.25)] active:scale-[0.98] uppercase tracking-wider" type="button"
+            <button className="mt-3 w-full bg-[#00e5ff] hover:bg-[#00b8d4] text-black font-bold py-3.5 text-xs tracking-[0.2em] uppercase transition-colors" type="button"
                 onClick={executeTrade}
                 disabled={executingTrade}
             >Trade</button>
