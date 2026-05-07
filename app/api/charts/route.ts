@@ -1,3 +1,4 @@
+import { time } from 'console';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -8,22 +9,19 @@ export async function GET() {
 
     const data = await res.json();
 
+    console.log('RAW:', data.data.attributes.ohlcv_list[0])
+
     const formatted = data.data.attributes.ohlcv_list
         .map((item: any) => {
-            const rawOpen  = Number(item[1]);
-            const rawClose = Number(item[4]);
-            const rawHigh  = Number(item[2]);
-            const rawLow   = Number(item[3]);
+            const open = Number(item[1]);
+            const close = Number(item[4]);
+            const high = Number(item[2]);
+            const low = Number(item[3]);
 
-            if (!rawOpen || !rawClose || !rawHigh || !rawLow) return null;
+            if (!open || !close || !high || !low) return null;
 
-            return {
-                time: item[0],
-                open:  1 / rawOpen,
-                close: 1 / rawClose,
-                high:  1 / rawLow,   // inverted: low → high
-                low:   1 / rawHigh,  // inverted: high → low
-            };
+            return { time: item[0], open, close, high, low };
+
         })
         .filter(Boolean)
         .reverse();
