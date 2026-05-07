@@ -171,23 +171,23 @@ export const SwapWidget = ({ setSigner, dexes, signer, setTrade, setToken, trade
                   {dex ? dex.name : "-"} <span className="text-[#00e676]">✓ BEST</span>
                 </span>
               </div>
-              <div className="fle justify-between pb-2 border-b border-[#1e2d3d]">
+              <div className="flex justify-between pb-2 border-b border-[#1e2d3d]">
                 <span className="text-[9px] text-[#4a6080] tracking-widest">Amount token sold</span>
                 <span className="text-[#00e676] font-bold">
-                  {trade ? formatUnits(trade.amountIn, trade.meta.decimalsIn) : "Loading..."}
+                  {trade ? formatUnits(trade.amountIn, trade.meta.decimalsIn) : "--"}
                 </span>
               </div>
               <div className="flex justify-between pb-2 border-b border-[#1e2d3d]">
                 <span className="text-[9px] text-[#4a6080] tracking-widest">Amount token bought</span>
                 <span className="text-[#00e676] font-bold">
-                  {trade ? formatUnits(trade.amountOut, trade.meta.decimalsOut) : "Loading..."}
+                  {trade ? formatUnits(trade.amountOut, trade.meta.decimalsOut) : "--"}
                 </span>
               </div>
 
               <div className="flex justify-between text-[11px] text-[#4a6080] tracking-widest">
                 <span className="text-[9px] text-[#4a6080] tracking-widest">Slippage tolerance</span>
                 <span className="text-[#00e676] font-bold">
-                  {trade ? "1%" : "Loading..."}
+                  {trade ? "1%" : "--"}
                 </span>
               </div>
             </div>
