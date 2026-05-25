@@ -22,7 +22,7 @@ export default function DexChart() {
             layout: {
                 background: { type: ColorType.Solid, color: '#0d1117' },
                 textColor: '#4a6080',
-                fontSize: 11,
+                fontSize: 12,
                 fontFamily: "'IBM Plex Mono', monospace",
             },
             grid: {
@@ -31,14 +31,14 @@ export default function DexChart() {
             },
             rightPriceScale: {
                 borderColor: '#1e2d3d',
-                minimumWidth: 120,
+                minimumWidth: 50,
                 scaleMargins: { top: 0.08, bottom: 0.08 },
             },
             timeScale: {
                 borderColor: '#1e2d3d',
                 timeVisible: true,
                 secondsVisible: false,
-                barSpacing: 8,
+                barSpacing: 16,
             },
             crosshair: {
                 vertLine: {
@@ -55,7 +55,7 @@ export default function DexChart() {
         const candleSeries = chart.addSeries(CandlestickSeries, {
             upColor: '#00e676',
             downColor: '#ff1744',
-            borderVisible: false,
+            borderVisible: true,
             wickUpColor: '#00e676',
             wickDownColor: '#ff1744',
             priceFormat: {
@@ -64,6 +64,8 @@ export default function DexChart() {
                 minMove: 0.0000001,
             },
         });
+
+        chart.timeScale().applyOptions({ barSpacing: 16 });
 
         chartRef.current = chart;
         seriesRef.current = candleSeries;
